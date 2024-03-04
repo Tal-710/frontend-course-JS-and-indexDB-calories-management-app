@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+    <script src="idb.js"></script>
+    <script>
+        async function test() {
+            const db = await idb.openCaloriesDB("caloriesdb", 1);
+            const result1 =
+                await db.addCalories({
+                    calorie: 200, category: "LUNCH",
+                    description: "glass of milk"
+                });
+            const result2 =
+                await db.addCalories({
+                    calorie: 300, category: "LUNCH",
+                    description: "pizza slice"
+                });
+            if (db) {
+                console.log("creating db succeeded");
+            }
+            if (result1) {
+                console.log("adding 1st calories consumption succeeded");
+            }
+            if (result2) {
+                console.log("adding 2nd calories consumption succeeded");
+            }
+        }
+        test()
+        //...
+    </script>
+</body>
+
+</html>
