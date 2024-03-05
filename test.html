@@ -21,6 +21,8 @@
                     calorie: 300, category: "LUNCH",
                     description: "pizza slice"
                 });
+            const result3 =
+                await db.getReport(3, 2024);
             if (db) {
                 console.log("creating db succeeded");
             }
@@ -30,6 +32,11 @@
             if (result2) {
                 console.log("adding 2nd calories consumption succeeded");
             }
+            if (result3) {
+                console.log("adding 3nd calories consumption succeeded");
+            }
+
+
         }
         test()
         //...
