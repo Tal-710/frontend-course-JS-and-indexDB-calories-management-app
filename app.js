@@ -1,3 +1,19 @@
+/*
+    developers:
+        1. developer
+        first name: Amit, 
+        last name": Pompas, 
+        id:315072397,
+        2. developer
+        first name: Lior, 
+        last name": Bezalel, 
+        id:207015249,
+        3. developer
+        first name: Tal, 
+        last name": Brachya, 
+        id:318660859,  
+*/
+
 document.addEventListener('DOMContentLoaded', function () {
 	// Reference to the modal save button and form elements
 	const saveBtn = document.getElementById('saveRecordBtn');

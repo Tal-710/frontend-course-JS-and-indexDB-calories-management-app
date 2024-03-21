@@ -1,3 +1,19 @@
+/*
+    developers:
+        1. developer
+        first name: Amit, 
+        last name": Pompas, 
+        id: 315072397,
+        2. developer
+        first name: Lior, 
+        last name": Bezalel, 
+        id: 207015249,
+        3. developer
+        first name: Tal, 
+        last name": Brachya, 
+        id: 318660859,  
+*/
+
 //----------------- ADDED FUNCTION FOR DATE formatting-----------------
 function formatDate(date) {
 	let day = date.getDate();
