@@ -6,8 +6,15 @@ document.addEventListener('DOMContentLoaded', function () {
 	const categorySelect = document.getElementById('category'); // Reference to category select
 	const descriptionTextarea = document.getElementById('description'); // Reference to description textarea
 	const reportArea = document.getElementById('reportArea');
+	//---------------------------/
+	const toggleReportType = document.getElementById('toggleReportType');
+	const dateSelectors = document.getElementById('dateSelectors');
+	const monthSelector = document.getElementById('monthSelector');
+	const yearSelector = document.getElementById('yearSelector');
+	const currentYear = new Date().getFullYear();
+	//---------------------------/
 
-	// Initialize the database
+	// 1. Initialize the database
 	window.idb
 		.openCaloriesDB('caloriesdb', 1)
 		.then(function (db) {
@@ -19,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			console.error('Database initialization failed:', error)
 		);
 
-	// Save button click event
+	// 2. Save button click event
 	saveBtn.addEventListener('click', function () {
 		const dateValue = dateInput.value
 			? new Date(dateInput.value)
@@ -63,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			);
 	});
 
-	// Function to display calorie report
+	// 3. display calorie report
 	function displayReport(db) {
 		const currentDate = new Date();
 		const currentMonth = currentDate.getMonth() + 1; // JS months are 0-indexed
@@ -79,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
 					results.forEach((entry) => {
 						const listItem = document.createElement('li');
 						listItem.className = 'list-group-item';
-						// Adjusted to display the description and calorie values correctly
 						listItem.textContent = `Description: ${entry.description}, Calories: ${entry.calorie}, Category: ${entry.category}, Date: ${entry.date}`;
 						list.appendChild(listItem);
 					});
@@ -93,4 +99,67 @@ document.addEventListener('DOMContentLoaded', function () {
 				console.error('Failed to fetch calorie entries:', error)
 			);
 	}
+
+	// 4.display calorie By month and year
+	//toggleReportType
+	toggleReportType.addEventListener('change', function () {
+		if (this.checked) {
+			// Show month and year selectors
+			dateSelectors.style.display = 'block';
+			fetchAndDisplayReport();
+		} else {
+			// Hide month and year selectors and show all reports
+			dateSelectors.style.display = 'none';
+			fetchAndDisplayReport(); // Call without parameters to fetch all
+		}
+	});
+	// 4.2 dynamic 10 years dropdown filler
+	for (let year = currentYear; year >= currentYear - 10; year--) {
+		const option = document.createElement('option');
+		option.value = year;
+		option.textContent = year;
+		yearSelector.appendChild(option);
+	}
+
+	// 4.3 Fetch and display report based on selections
+	function fetchAndDisplayReport() {
+		const month = toggleReportType.checked
+			? parseInt(monthSelector.value, 10)
+			: undefined;
+		const year = toggleReportType.checked
+			? parseInt(yearSelector.value, 10)
+			: undefined;
+
+		window.idb
+			.openCaloriesDB('caloriesdb', 1)
+			.then((db) => {
+				if (typeof month === 'number' && typeof year === 'number') {
+					return db.getReport(month, year); // Fetch filtered report
+				} else {
+					return db.getReport(); // Fetch all reports
+				}
+			})
+			.then((results) => {
+				reportArea.innerHTML = '';
+				if (results.length > 0) {
+					const list = document.createElement('ul');
+					list.className = 'list-group';
+					results.forEach((entry) => {
+						const listItem = document.createElement('li');
+						listItem.className = 'list-group-item';
+						// Here you need to adjust the display according to your entry structure
+						listItem.textContent = `Description: ${entry.description}, Calories: ${entry.calorie}, Category: ${entry.category}, Date: ${entry.date}`;
+						list.appendChild(listItem);
+					});
+					reportArea.appendChild(list);
+				} else {
+					reportArea.textContent = 'No records found.';
+				}
+			})
+			.catch((error) => console.error('Failed to fetch reports:', error));
+	}
+
+	// Attach event listeners to month and year selectors to fetch report on change
+	monthSelector.addEventListener('change', fetchAndDisplayReport);
+	yearSelector.addEventListener('change', fetchAndDisplayReport);
 });
