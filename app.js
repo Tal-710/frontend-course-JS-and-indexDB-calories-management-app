@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	const saveBtn = document.getElementById('saveRecordBtn');
 	const dateInput = document.getElementById('date');
 	const caloriesInput = document.getElementById('calories');
+	const categorySelect = document.getElementById('category'); // Reference to category select
+	const descriptionTextarea = document.getElementById('description'); // Reference to description textarea
 	const reportArea = document.getElementById('reportArea');
 
 	// Initialize the database
@@ -19,35 +21,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// Save button click event
 	saveBtn.addEventListener('click', function () {
-		const date = new Date(dateInput.value);
-		const month = date.getMonth() + 1; // JS months are 0-indexed
-		const year = date.getFullYear();
-		const calories = parseInt(caloriesInput.value, 10);
+		const dateValue = dateInput.value
+			? new Date(dateInput.value)
+			: new Date();
+		const caloriesValue = parseInt(caloriesInput.value, 10);
+		const categoryValue = categorySelect.value; // Get the selected category value
+		const descriptionValue = descriptionTextarea.value; // Get the description text value
 
 		const calorieEntry = {
-			date: date.toISOString(),
-			month,
-			year,
-			calories,
+			date: dateValue.toISOString(),
+			month: dateValue.getMonth() + 1, // JS months are 0-indexed
+			year: dateValue.getFullYear(),
+			calorie: caloriesValue,
+			category: categoryValue, // Use the value from the category select
+			description: descriptionValue, // Use the value from the description textarea
 		};
 
-		// Add calorie record to the database
-		window.idb.openCaloriesDB('caloriesdb', 1).then((db) => {
-			db.addCalories(calorieEntry)
-				.then(() => {
-					console.log('Calorie entry added');
-					// Clear form inputs
-					dateInput.value = '';
-					caloriesInput.value = '';
-					// Display the updated report
-					displayReport(db);
-					// Hide the modal
-					$('#addRecordModal').modal('hide');
-				})
-				.catch((error) =>
-					console.error('Failed to add calorie entry:', error)
-				);
-		});
+		// 1) API func: add Item
+		window.idb
+			.openCaloriesDB('caloriesdb', 1)
+			.then((db) => {
+				return db.addCalories(calorieEntry);
+			})
+			.then(() => {
+				console.log('Calorie entry added');
+				// Clear form inputs
+				dateInput.value = '';
+				caloriesInput.value = '';
+				categorySelect.value = 'BREAKFAST';
+				descriptionTextarea.value = '';
+				// Display the updated report
+				return window.idb.openCaloriesDB('caloriesdb', 1);
+			})
+			.then((db) => {
+				displayReport(db);
+				// Hide the modal
+				$('#addRecordModal').modal('hide');
+			})
+			.catch((error) =>
+				console.error('Failed to add calorie entry:', error)
+			);
 	});
 
 	// Function to display calorie report
@@ -56,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const currentMonth = currentDate.getMonth() + 1; // JS months are 0-indexed
 		const currentYear = currentDate.getFullYear();
 
-		db.getReport(currentMonth, currentYear)
+		db.getReport()
 			.then((results) => {
 				// Clear previous report
 				reportArea.innerHTML = '';
@@ -67,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						const listItem = document.createElement('li');
 						listItem.className = 'list-group-item';
 						// Adjusted to display the description and calorie values correctly
-						listItem.textContent = `Description: ${entry.description}, Calories: ${entry.calorie}, Category: ${entry.category}`;
+						listItem.textContent = `Description: ${entry.description}, Calories: ${entry.calorie}, Category: ${entry.category}, Date: ${entry.date}`;
 						list.appendChild(listItem);
 					});
 					reportArea.appendChild(list);

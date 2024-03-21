@@ -22,16 +22,20 @@ const idb = {
 				const db = dbOpenRequest.result;
 				// attach the different functionality to db, when access to indexDB is success
 				const dbAPI = {
-					//
+					// 1) API func: add Item
 					async addCalories(calorieEntry) {
 						return new Promise((resolve, reject) => {
 							// added logic - check if month & year provided, if not = assign it with current data
 							const currentDate = new Date();
-							calorieEntry.month =
-								calorieEntry.month ||
-								currentDate.getMonth() + 1; // JS months are 0-indexed
-							calorieEntry.year =
-								calorieEntry.year || currentDate.getFullYear();
+
+							// If calorieEntry.date is not provided, use the current date
+							if (!calorieEntry.date) {
+								// This will create a date object with the current date
+								calorieEntry.date = currentDate;
+							} else {
+								// Assuming calorieEntry.date is already a Date object or a string that can be parsed into a Date object
+								calorieEntry.date = new Date(calorieEntry.date);
+							}
 							//---
 
 							//--execute Transaction process
@@ -52,7 +56,33 @@ const idb = {
 							request.onsuccess = () => resolve(true);
 						});
 					},
+					// 2) API func: get ALL Items
+					async getReport() {
+						return new Promise((resolve, reject) => {
+							const transaction = db.transaction(
+								'calories',
+								'readonly'
+							);
+							const store = transaction.objectStore('calories');
+							const request = store.openCursor();
+							const results = [];
 
+							request.onerror = () =>
+								reject('Failed to fetch calorie entries');
+							request.onsuccess = (event) => {
+								const cursor = event.target.result;
+								if (cursor) {
+									results.push(cursor.value); // Add all entries to results array
+									cursor.continue();
+								} else {
+									// Resolved with all fetched entries
+									resolve(results);
+								}
+							};
+						});
+					},
+
+					// 3) API func: get By Month and Year
 					async getReport(month, year) {
 						return new Promise((resolve, reject) => {
 							const transaction = db.transaction(
