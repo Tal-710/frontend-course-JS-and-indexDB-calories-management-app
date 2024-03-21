@@ -64,7 +64,7 @@ const idb = {
 								reject('Failed to add calorie entry');
 							//--
 
-							// 2.2: Transaction success 
+							// 2.2: Transaction success
 							request.onsuccess = () => resolve(true);
 						});
 					},
@@ -72,10 +72,6 @@ const idb = {
 					// 2) API func: fetch all calorie entries. Optionally filters by month and year if provided.
 					async getReport(month, year) {
 						return new Promise((resolve, reject) => {
-							// Checks if both month and year are provided for filtering
-							const filterByDate =
-								month !== undefined && year !== undefined;
-
 							const transaction = db.transaction(
 								'calories',
 								'readonly'
@@ -90,10 +86,18 @@ const idb = {
 								const cursor = event.target.result;
 								if (cursor) {
 									const entry = cursor.value;
+									// Assuming entry.date is in "dd/mm/yyyy" format
+									const [entryDay, entryMonth, entryYear] =
+										entry.date
+											.split('/')
+											.map((part) => parseInt(part, 10));
+
+									// Determine if we should include this entry based on the provided month and year
 									if (
-										!filterByDate ||
-										(entry.month === month &&
-											entry.year === year)
+										!month ||
+										!year ||
+										(entryMonth === month &&
+											entryYear === year)
 									) {
 										results.push(entry);
 									}
