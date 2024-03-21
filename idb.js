@@ -1,4 +1,3 @@
-// This is a simplified version focusing on the specific test provided.
 // It assumes the existence of an 'idb' global object that facilitates working with IndexedDB.
 
 const idb = {
