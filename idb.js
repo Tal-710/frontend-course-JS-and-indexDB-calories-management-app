@@ -15,7 +15,7 @@
 */
 //idb.js
 
-//----------------- ADDED FUNCTION FOR DATE formatting-----------------
+// format date object into "dd/mm/yyyy" format
 function formatDate(date) {
 	let day = date.getDate();
 	let month = date.getMonth() + 1; // Months are zero-based
@@ -28,51 +28,53 @@ function formatDate(date) {
 	// Return the formatted date string
 	return day + '/' + month + '/' + year;
 }
-//-----------------------END DATA FORMATTER---------------------------------------
 
-// It assumes the existence of an 'idb' global object that facilitates working with IndexedDB.
+// Defines an 'idb' object for interacting with IndexedDB
 const idb = {
-	// 1. initialize work with indexDB as the test tell to create idb object with openCaloriesDB nested sub class
+	// 1. Initialize or open a database with a given name and version
 	async openCaloriesDB(dbName, version) {
 		// 1.1 dbOpenRequest <- ref to open connection to indexdb
 		const dbOpenRequest = indexedDB.open(dbName, version);
-		// 1.2 Create or upgrade the database schema if necessary
 		dbOpenRequest.onupgradeneeded = (event) => {
-			// 1.3 db <- ref the events that accrues in our dataBase
+			// Handle database upgrades, including initial creation
 			const db = event.target.result;
-			// 1.4 if no such dataBase -> create
 			if (!db.objectStoreNames.contains('calories')) {
 				db.createObjectStore('calories', { autoIncrement: true });
 			}
 		};
-		// 1.5 end of initialization
 
-		// 2. declare Promises for different actions
+
+		
+		
+		
+		
+		
+		
+		
+		// 2. Return a promise that resolves with the database API on success
 		return new Promise((resolve, reject) => {
-			// 2.1: On error approaching IndexDB
+			// 2.1: custom error:On error approaching IndexDB
 			dbOpenRequest.onerror = () => reject('Failed to open db');
 			// 2.2: On success -> ref the open access to dbName->'calories' database
 			dbOpenRequest.onsuccess = () => {
 				// 3. db <- Ref to db access
 				const db = dbOpenRequest.result;
-				// 4. attach the different functionality to db, when access to indexDB is success
+				// 4. attach functionality to db, when access to indexDB is success
 				const dbAPI = {
-					// 1) API func: add Item
+					// 1) API func: add Item 
+					//(fills current date if not provided)
 					async addCalories(calorieEntry) {
 						return new Promise((resolve, reject) => {
-							// 1.1: in case user not provide date
 							const currentDate = new Date();
 							if (!calorieEntry.date) {
-								// 1.2: "date" not provided-> format and use current date
 								calorieEntry.date = formatDate(currentDate);
 							} else {
-								// 1.3: "date" is provided-> format it and add it
 								calorieEntry.date = formatDate(
 									new Date(calorieEntry.date)
 								);
 							}
 
-							//1.4: run Transaction process
+							// run Transaction process
 							const transaction = db.transaction(
 								'calories',
 								'readwrite'
@@ -89,7 +91,24 @@ const idb = {
 						});
 					},
 
-					// 2) API func: fetch all calorie entries. Optionally filters by month and year if provided.
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					// 2) API func: fetch all entries 
+					//(Optionally filters by month,year if provided)
 					async getReport(month, year) {
 						return new Promise((resolve, reject) => {
 							// 2.1 set transaction process
@@ -108,32 +127,22 @@ const idb = {
 								const cursor = event.target.result;
 								if (cursor) {
 									const entry = cursor.value;
-									// 2.3 Check if entry.date exists and is a string before splitting
-									if (typeof entry.date === 'string') {
-										const [
-											entryDay,
-											entryMonth,
-											entryYear,
-										] = entry.date
-											.split('/')
-											.map((part) => parseInt(part, 10));
+									// Parse the entry's date to extract month and year
+									const [, entryMonth, entryYear] = entry.date
+										.split('/')
+										.map((part) => parseInt(part, 10));
 
-										// 2.4 Your existing logic to decide if the entry should be included
+									if (!month && !year) {
+										// Case 1: Month, year not provided, push all entries
+										results.push(entry);
+									} else if (month && year) {
+										// Case 2: Both month, year provided-> filter entries
 										if (
-											!month ||
-											!year ||
-											(entryMonth === month &&
-												entryYear === year)
+											entryMonth === month &&
+											entryYear === year
 										) {
 											results.push(entry);
 										}
-									} else {
-										console.warn(
-											'Entry missing valid date:',
-											entry
-										);
-										results.push(entry);
-										// Optionally handle the case where the date is missing or invalid
 									}
 									cursor.continue();
 								} else {

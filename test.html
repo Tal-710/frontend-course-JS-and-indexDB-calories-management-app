@@ -21,8 +21,45 @@
                     calorie: 300, category: "LUNCH",
                     description: "pizza slice"
                 });
-            const result3 =
+
+            const result3 = await db.addCalories({
+                calorie: 150,
+                category: 'BREAKFAST',
+                description: 'apple',
+                date: '10/01/2023'
+            })
+
+            const result4 = await db.addCalories({
+                calorie: 494,
+                category: 'LUNCH',
+                description: 'glass of milk',
+                date: '08/01/2022'
+            })
+
+            const result5 = await db.addCalories({
+                calorie: 329,
+                category: 'DINNER',
+                description: 'omelette',
+                date: '04/01/2021'
+            })
+
+            const result6 = await db.addCalories({
+                calorie: 514,
+                category: 'OTHER',
+                description: 'Ozen haman',
+                date: '10/01/2020'
+            })
+
+            const result7 = await db.addCalories({
+                calorie: 450,
+                category: 'BREAKFAST',
+                description: 'Kariot breakfast cereal',
+                date: '05/01/2019'
+            })
+
+            const result8 =
                 await db.getReport(3, 2024);
+
             if (db) {
                 console.log("creating db succeeded");
             }
@@ -35,8 +72,21 @@
             if (result3) {
                 console.log("adding 3nd calories consumption succeeded");
             }
-
-
+            if (result4) {
+                console.log("adding 3nd calories consumption succeeded");
+            }
+            if (result5) {
+                console.log("adding 3nd calories consumption succeeded");
+            }
+            if (result6) {
+                console.log("adding 3nd calories consumption succeeded");
+            }
+            if (result7) {
+                console.log("adding 3nd calories consumption succeeded");
+            }
+            if (result8) {
+                console.log(result8);
+            }
         }
         test()
         //...
