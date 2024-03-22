@@ -43,14 +43,6 @@ const idb = {
 			}
 		};
 
-
-		
-		
-		
-		
-		
-		
-		
 		// 2. Return a promise that resolves with the database API on success
 		return new Promise((resolve, reject) => {
 			// 2.1: custom error:On error approaching IndexDB
@@ -61,7 +53,7 @@ const idb = {
 				const db = dbOpenRequest.result;
 				// 4. attach functionality to db, when access to indexDB is success
 				const dbAPI = {
-					// 1) API func: add Item 
+					// 1) API func: add Item
 					//(fills current date if not provided)
 					async addCalories(calorieEntry) {
 						return new Promise((resolve, reject) => {
@@ -91,23 +83,7 @@ const idb = {
 						});
 					},
 
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					// 2) API func: fetch all entries 
+					// 2) API func: fetch all entries
 					//(Optionally filters by month,year if provided)
 					async getReport(month, year) {
 						return new Promise((resolve, reject) => {

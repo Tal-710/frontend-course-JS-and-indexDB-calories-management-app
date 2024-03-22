@@ -40,23 +40,22 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 	//---------------------------/
 
-
-
-
-
-
-
-
-
-
-
-
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	// 1. Initialize the database
 	function initializeDatabaseAndDisplayReports() {
 		window.idb
 			.openCaloriesDB('caloriesdb', 1)
-			.then(getAllReports) // line 195
+			.then(getAllReports) // line 196
 			.catch((error) =>
 				console.error('Database initialization failed:', error)
 			);
@@ -71,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		);
 		ui.monthSelector.addEventListener('change', getReportByMonthAndYear); //line 204
 		ui.yearSelector.addEventListener('change', getReportByMonthAndYear); //line  204
-		fillYearDropdown();//line 166
+		fillYearDropdown(); //line 166
 
 		// When adding new item - > reportArea to show all reports
 		$('#addRecordModal').on('show.bs.modal', function () {
@@ -79,34 +78,35 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (ui.toggleReportType.checked) {
 				ui.toggleReportType.checked = false;
 				// Optionally, call the handler to adjust UI accordingly if needed
-				handleToggleReportTypeChange.call(ui.toggleReportType);
+				handleToggleReportTypeChange.call(ui.toggleReportType); //line 158
 			}
 		});
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 
 
 
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	// 3. Save button click event = add new Item
 	function handleSaveButtonClick() {
 		// 3.1 Get values from html
@@ -132,8 +132,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then((db) => {
 				return db.addCalories(calorieEntry).then(() => {
 					console.log('Calorie entry added');
-					handleClearFormInputs(); // Clears form inputs after adding an entry - line 145
+					handleClearFormInputs(); // Clears form inputs after adding an entry
+					// - line 149
 					$('#addRecordModal').modal('hide'); // Using jQuery to hide the modal
+
+					// After adding a new entry, fetch and display all entries
+					getAllReports(db); // Pass the db instance to getAllReports - line 196
 				});
 			})
 			.catch((error) =>
@@ -149,20 +153,17 @@ document.addEventListener('DOMContentLoaded', function () {
 		ui.descriptionTextarea.value = '';
 	}
 
-	// 5. set up index.html -> getting calories by month and year
-	// 5.1 toggleReportType
+	// 4. set up index.html -> getting calories by month and year
+	// 4.1 toggleReportType
 	function handleToggleReportTypeChange() {
 		ui.dateSelectors.style.display = this.checked ? 'block' : 'none';
-		getReportByMonthAndYear(); // line 204
+		getReportByMonthAndYear(); // line 205
 	}
 
-	
-	
-	
-	
-	
-	
-	// 5.2 dynamic 10 years dropdown filler
+
+
+
+	// 4.2 dynamic 10 years dropdown filler
 	function fillYearDropdown() {
 		const currentYear = new Date().getFullYear();
 		for (let year = currentYear; year >= currentYear - 10; year--) {
@@ -173,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	// 6. Function to render entries to be use in 6.1 and 6.2
+	// 5. Function to render entries to be use in 5.1 and 5.2
 	function renderEntries(entries) {
 		ui.reportArea.innerHTML = ''; // Clear previous report
 		if (entries.length > 0) {
@@ -191,16 +192,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	// 6.1 display All calorie items from database
+	// 5.1 display All calorie items from database
 	function getAllReports(db) {
 		// idb.js API func: add Item
 		db.getReport()
-			.then(renderEntries) //line 177
+			.then(renderEntries) //line 178
 			.catch((error) =>
 				console.error('Failed to fetch calorie entries:', error)
 			);
 	}
-	// 6.2 display Specific calorie items, based on selections
+	// 5.2 display Specific calorie items, based on selections
 	function getReportByMonthAndYear() {
 		const month = toggleReportType.checked
 			? parseInt(ui.monthSelector.value, 10)
@@ -210,9 +211,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			: undefined;
 
 		window.idb
-			.openCaloriesDB('caloriesdb', 1) 
-			.then((db) => db.getReport(month, year)) // idb.js API func: get by month and year
-			.then(renderEntries)//line 177
+			.openCaloriesDB('caloriesdb', 1)
+			.then((db) => db.getReport(month, year)) // idb.js API func: 
+			// get by month and year
+			.then(renderEntries) //line 178
 			.catch((error) => console.error('Failed to fetch reports:', error));
 	}
 });
