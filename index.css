@@ -2,12 +2,13 @@
 body {
 	background-color: #f8f9fa;
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: #1377e2;
 }
 
 /* Modal Customizations */
 .modal-header {
 	background-color: #007bff;
-	color: #fff;
+	color: #eee;
 }
 
 .modal-footer {
@@ -33,25 +34,21 @@ body {
 .form-control {
 	border-radius: 0.25rem;
 	border-color: #0056b3;
-	margin-top: 0.25 rem;
+	margin-top: 10px;
 }
 
 /* Report Display Enhancements */
 #reportArea {
 	background-color: #007bff;
-	border: 1px solid #ddd;
-	padding: 20px;
+	border: 1px solid #4652f6;
+	padding: 1px;
 	border-radius: 0.25rem;
-	margin-top: 20px;
+	margin-top: 2px;
 }
 
-h2 {
-	color: #333;
-}
-
-/* Visibility Toggle for Date Selectors */
-#dateSelectors {
-	transition: all 0.3s ease-in-out;
+h1 {
+	text-align: left;
+	color: #048dfd;
 }
 
 /* Utility Classes */
@@ -61,4 +58,13 @@ h2 {
 
 .mb-3 {
 	margin-bottom: 1rem !important;
+}
+.button-container {
+	display: flex;
+	justify-content: left; /* This centers the buttons horizontally */
+	align-items: center; /* This centers the buttons vertically (if needed) */
+}
+
+.btn {
+	margin: 0.15rem;
 }
