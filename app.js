@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	let descriptionTextarea = document.getElementById('description');
 	let reportArea = document.getElementById('reportArea');
 	let monthlyReportBtn = document.getElementById('monthlyReportBtn');
+	let allReportBtn = document.getElementById('allReportBtn');
 	let dateSelectors = document.getElementById('dateSelectors');
 	let monthSelector = document.getElementById('monthSelector');
 	let yearSelector = document.getElementById('yearSelector');
@@ -37,18 +38,24 @@ document.addEventListener('DOMContentLoaded', function () {
 	// Set up Listeners to ui objects and bind them with their handler functions
 	function setupEventListeners() {
 		saveBtn.addEventListener('click', handleSaveButtonClick);
-		monthlyReportBtn.addEventListener('click', handleMonthlyReportClick);
+		monthlyReportBtn.addEventListener('click', function () {
+			isMonthlyReport = true; // Set the flag to indicate monthly report is being requested
+			dateSelectors.style.display = 'block'; // Show the selectors for monthly report
+			getReportByMonthAndYear(); // Fetch and display the monthly report
+		});
+
+		// Listener for all reports button
+		allReportBtn.addEventListener('click', function () {
+			isMonthlyReport = false; // Reset the flag as we are requesting all reports
+			dateSelectors.style.display = 'none'; // Hide the selectors for monthly report
+			getAllReports(); // Fetch and display all reports
+		});
+
 		monthSelector.addEventListener('change', getReportByMonthAndYear);
 		yearSelector.addEventListener('change', getReportByMonthAndYear);
 		fillYearDropdown();
 	}
 
-	// change state when entering monthly report
-	function handleMonthlyReportClick() {
-		isMonthlyReport = !isMonthlyReport; // Toggle the state
-		dateSelectors.style.display = isMonthlyReport ? 'block' : 'none';
-		getReportByMonthAndYear();
-	}
 	// dynamic 10 years dropdown filler
 	function fillYearDropdown() {
 		const currentYear = new Date().getFullYear();
