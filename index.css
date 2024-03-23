@@ -1,0 +1,64 @@
+/* General Body Styling */
+body {
+	background-color: #f8f9fa;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Modal Customizations */
+.modal-header {
+	background-color: #007bff;
+	color: #fff;
+}
+
+.modal-footer {
+	background-color: #f1f1f1;
+}
+
+.modal-content {
+	border-radius: 0.5rem;
+}
+
+/* Button Customizations */
+.btn-primary {
+	background-color: #007bff;
+	border-color: #007bff;
+}
+
+.btn-primary:hover {
+	background-color: #0056b3;
+	border-color: #0056b3;
+}
+
+/* Form Input Enhancements */
+.form-control {
+	border-radius: 0.25rem;
+	border-color: #0056b3;
+	margin-top: 0.25 rem;
+}
+
+/* Report Display Enhancements */
+#reportArea {
+	background-color: #007bff;
+	border: 1px solid #ddd;
+	padding: 20px;
+	border-radius: 0.25rem;
+	margin-top: 20px;
+}
+
+h2 {
+	color: #333;
+}
+
+/* Visibility Toggle for Date Selectors */
+#dateSelectors {
+	transition: all 0.3s ease-in-out;
+}
+
+/* Utility Classes */
+.mt-5 {
+	margin-top: 3rem !important;
+}
+
+.mb-3 {
+	margin-bottom: 1rem !important;
+}

@@ -25,6 +25,8 @@
     <title>Calorie Tracker</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="index.css" rel="stylesheet">
 
 </head>
 
@@ -40,8 +42,6 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-
-
                 <div class="modal-body">
                     <!-- Form content here -->
                     <form id="recordForm">
@@ -76,20 +76,17 @@
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRecordModal">
-        Add New Record
-    </button>
 
-
-
-    <!-- Report Display Area -->
     <div class="container mt-5">
-        <!-- Toggle Button -->
-        <div class="custom-control custom-switch">
-            <input type="checkbox" class="custom-control-input" id="toggleReportType">
-            <label class="custom-control-label" for="toggleReportType">Monthly Report</label>
-        </div>
 
+        <h1>Calorie Reports</h1>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRecordModal">
+            Add New Record
+        </button>
+
+        <button type="button" class="btn btn-outline-primary my-2" id="monthlyReportBtn">
+            Monthly Report
+        </button>
         <!-- Dropdown for selecting month and year -->
         <div class="row mb-3" id="dateSelectors" style="display: none;">
             <div class="col">
@@ -114,9 +111,7 @@
                 </select>
             </div>
         </div>
-
         <!-- Report Display Area -->
-        <h2>Calorie Reports</h2>
         <div id="reportArea"></div>
     </div>
 

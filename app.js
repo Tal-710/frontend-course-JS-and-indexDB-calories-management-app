@@ -15,52 +15,38 @@
 */
 // app.js
 document.addEventListener('DOMContentLoaded', function () {
-	//------------1 build page---------------
-	initializeApp();
+	//------------1 bd page---------------
+	let saveBtn = document.getElementById('saveRecordBtn');
+	let dateInput = document.getElementById('date');
+	let caloriesInput = document.getElementById('calories');
+	let categorySelect = document.getElementById('category');
+	let descriptionTextarea = document.getElementById('description');
+	let reportArea = document.getElementById('reportArea');
+	let monthlyReportBtn = document.getElementById('monthlyReportBtn');
+	let dateSelectors = document.getElementById('dateSelectors');
+	let monthSelector = document.getElementById('monthSelector');
+	let yearSelector = document.getElementById('yearSelector');
+	let isMonthlyReport = false;
+
 	function initializeApp() {
-		bindUIElements();
 		setupEventListeners();
 		initializeDatabaseAndDisplayReports();
 	}
-	// use the global object to bind UI elements
-	function bindUIElements() {
-		window.ui = {
-			saveBtn: document.getElementById('saveRecordBtn'),
-			dateInput: document.getElementById('date'),
-			caloriesInput: document.getElementById('calories'),
-			categorySelect: document.getElementById('category'),
-			descriptionTextarea: document.getElementById('description'),
-			reportArea: document.getElementById('reportArea'),
-			toggleReportType: document.getElementById('toggleReportType'),
-			dateSelectors: document.getElementById('dateSelectors'),
-			monthSelector: document.getElementById('monthSelector'),
-			yearSelector: document.getElementById('yearSelector'),
-		};
-	}
-	// Set up Listeners to UI objects and bind them with their handler functions
+	initializeApp();
+
+	// Set up Listeners to ui objects and bind them with their handler functions
 	function setupEventListeners() {
-		ui.saveBtn.addEventListener('click', handleSaveButtonClick);
-		ui.toggleReportType.addEventListener(
-			'change',
-			handleToggleReportTypeChange
-		);
-		ui.monthSelector.addEventListener('change', getReportByMonthAndYear);
-		ui.yearSelector.addEventListener('change', getReportByMonthAndYear);
+		saveBtn.addEventListener('click', handleSaveButtonClick);
+		monthlyReportBtn.addEventListener('click', handleMonthlyReportClick);
+		monthSelector.addEventListener('change', getReportByMonthAndYear);
+		yearSelector.addEventListener('change', getReportByMonthAndYear);
 		fillYearDropdown();
-		setupModalBehavior();
 	}
-	// when entering Modal = reportArea to show all reports
-	function setupModalBehavior() {
-		$('#addRecordModal').on('show.bs.modal', function () {
-			if (ui.toggleReportType.checked) {
-				ui.toggleReportType.checked = false;
-				handleToggleReportTypeChange.call(ui.toggleReportType);
-			}
-		});
-	}
+
 	// change state when entering monthly report
-	function handleToggleReportTypeChange() {
-		ui.dateSelectors.style.display = this.checked ? 'block' : 'none';
+	function handleMonthlyReportClick() {
+		isMonthlyReport = !isMonthlyReport; // Toggle the state
+		dateSelectors.style.display = isMonthlyReport ? 'block' : 'none';
 		getReportByMonthAndYear();
 	}
 	// dynamic 10 years dropdown filler
@@ -70,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const option = document.createElement('option');
 			option.value = year;
 			option.textContent = year;
-			ui.yearSelector.appendChild(option);
+			yearSelector.appendChild(option);
 		}
 	}
 
@@ -87,39 +73,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	//------------2 input validation---------------
 	function getDateInputValue() {
-		return ui.dateInput.value ? new Date(ui.dateInput.value) : new Date();
+		return dateInput.value ? new Date(dateInput.value) : new Date();
 	}
 	// Validation function
 	function validateInputs() {
-		const dateInput = ui.dateInput.value;
-		const caloriesInput = ui.caloriesInput.value;
-		const categorySelect = ui.categorySelect.value;
-		const descriptionTextarea = ui.descriptionTextarea.value;
-
 		// Date validation (simple check if the input is not empty and is a valid date)
-		if (!dateInput || isNaN(new Date(dateInput).getTime())) {
+		if (!dateInput.value || isNaN(new Date(dateInput.value).getTime())) {
 			alert('Please enter a valid date.');
 			return false;
 		}
 
 		// Calories validation (must be a positive number)
 		if (
-			!caloriesInput ||
-			isNaN(caloriesInput) ||
-			parseInt(caloriesInput, 10) <= 0
+			!caloriesInput.value ||
+			isNaN(caloriesInput.value) ||
+			parseInt(caloriesInput.value, 10) <= 0
 		) {
 			alert('Please enter a valid calorie amount.');
 			return false;
 		}
 
 		// Category validation (should not be empty)
-		if (!categorySelect) {
+		if (!categorySelect.value) {
 			alert('Please select a category.');
 			return false;
 		}
 
 		// Description validation (should not be empty)
-		if (!descriptionTextarea.trim()) {
+		if (!descriptionTextarea.value.trim()) {
 			alert('Please enter a description.');
 			return false;
 		}
@@ -131,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	//------------3 add item process---------------
 	// Save button click event = add new Item
 	function handleSaveButtonClick() {
+		resetReportView();
 		if (!validateInputs()) {
 			console.error(
 				'Validation failed. Please correct the input fields.'
@@ -141,9 +123,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			date: getDateInputValue(),
 			month: getDateInputValue().getMonth() + 1,
 			year: getDateInputValue().getFullYear(),
-			calorie: parseInt(ui.caloriesInput.value, 10),
-			category: ui.categorySelect.value,
-			description: ui.descriptionTextarea.value.trim(),
+			calorie: parseInt(caloriesInput.value, 10),
+			category: categorySelect.value,
+			description: descriptionTextarea.value.trim(),
 		};
 		addCalorieEntry(calorieEntry);
 	}
@@ -156,8 +138,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				db.addCalories(calorieEntry)
 					.then(() => {
 						console.log('Calorie entry added');
-						handleClearFormInputs();
 						$('#addRecordModal').modal('hide');
+						handleClearFormInputs();
 						getAllReports();
 					})
 					.catch((error) => {
@@ -171,17 +153,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// clear form inputs after saving a record
 	function handleClearFormInputs() {
-		ui.dateInput.value = '';
-		ui.caloriesInput.value = '';
-		ui.categorySelect.value = 'BREAKFAST'; // Reset to default
-		ui.descriptionTextarea.value = '';
+		dateInput.value = '';
+		caloriesInput.value = '';
+		categorySelect.value = 'BREAKFAST'; // Reset to default
+		descriptionTextarea.value = '';
+	}
+
+	function resetReportView() {
+		isMonthlyReport = false;
+		dateSelectors.style.display = 'none';
 	}
 	//---------------------------------------------
 
 	//------------4 print reports---------------
 	// Function to render entries to be use in 4.1 and 4.2
 	function renderEntries(entries) {
-		ui.reportArea.innerHTML = '';
+		reportArea.innerHTML = '';
 		if (entries.length > 0) {
 			const list = document.createElement('ul');
 			list.className = 'list-group';
@@ -191,9 +178,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				listItem.textContent = `Description: ${entry.description}, Calories: ${entry.calorie}, Category: ${entry.category}, Date: ${entry.date}`;
 				list.appendChild(listItem);
 			});
-			ui.reportArea.appendChild(list);
+			reportArea.appendChild(list);
 		} else {
-			ui.reportArea.textContent = 'No records found.';
+			reportArea.textContent = 'No records found.';
 		}
 	}
 
@@ -207,11 +194,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 	// display Specific calorie items, based on selections
 	function getReportByMonthAndYear() {
-		const month = ui.toggleReportType.checked
-			? parseInt(ui.monthSelector.value, 10)
+		const shouldGetMonthlyReport = dateSelectors.style.display === 'block';
+
+		const month = isMonthlyReport
+			? parseInt(monthSelector.value, 10)
 			: undefined;
-		const year = ui.toggleReportType.checked
-			? parseInt(ui.yearSelector.value, 10)
+		const year = isMonthlyReport
+			? parseInt(yearSelector.value, 10)
 			: undefined;
 
 		window.idb
