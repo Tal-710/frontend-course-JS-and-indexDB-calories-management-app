@@ -15,15 +15,14 @@
 */
 // app.js
 document.addEventListener('DOMContentLoaded', function () {
-	//---------------- Page Set Up and Declarations
+	//------------1 build page---------------
 	initializeApp();
-
 	function initializeApp() {
-		bindUIElements(); //line 27
-		initializeDatabaseAndDisplayReports(); //line 56
-		setupEventListeners(); //line 66
+		bindUIElements();
+		setupEventListeners();
+		initializeDatabaseAndDisplayReports();
 	}
-
+	// use the global object to bind UI elements
 	function bindUIElements() {
 		window.ui = {
 			saveBtn: document.getElementById('saveRecordBtn'),
@@ -38,132 +37,33 @@ document.addEventListener('DOMContentLoaded', function () {
 			yearSelector: document.getElementById('yearSelector'),
 		};
 	}
-	//---------------------------/
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	// 1. Initialize the database
-	function initializeDatabaseAndDisplayReports() {
-		window.idb
-			.openCaloriesDB('caloriesdb', 1)
-			.then(getAllReports) // line 196
-			.catch((error) =>
-				console.error('Database initialization failed:', error)
-			);
-	}
-
-	// 2. Set up Listeners to UI objects and bind them with their handler functions
+	// Set up Listeners to UI objects and bind them with their handler functions
 	function setupEventListeners() {
-		ui.saveBtn.addEventListener('click', handleSaveButtonClick); //line 111
+		ui.saveBtn.addEventListener('click', handleSaveButtonClick);
 		ui.toggleReportType.addEventListener(
 			'change',
-			handleToggleReportTypeChange //line 154
+			handleToggleReportTypeChange
 		);
-		ui.monthSelector.addEventListener('change', getReportByMonthAndYear); //line 204
-		ui.yearSelector.addEventListener('change', getReportByMonthAndYear); //line  204
-		fillYearDropdown(); //line 166
-
-		// When adding new item - > reportArea to show all reports
+		ui.monthSelector.addEventListener('change', getReportByMonthAndYear);
+		ui.yearSelector.addEventListener('change', getReportByMonthAndYear);
+		fillYearDropdown();
+		setupModalBehavior();
+	}
+	// when entering Modal = reportArea to show all reports
+	function setupModalBehavior() {
 		$('#addRecordModal').on('show.bs.modal', function () {
-			// Check if the toggleReportType is on, if yes, switch it off
 			if (ui.toggleReportType.checked) {
 				ui.toggleReportType.checked = false;
-				// Optionally, call the handler to adjust UI accordingly if needed
-				handleToggleReportTypeChange.call(ui.toggleReportType); //line 158
+				handleToggleReportTypeChange.call(ui.toggleReportType);
 			}
 		});
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// 3. Save button click event = add new Item
-	function handleSaveButtonClick() {
-		// 3.1 Get values from html
-		const dateValue = ui.dateInput.value
-			? new Date(ui.dateInput.value)
-			: new Date();
-		const caloriesValue = parseInt(ui.caloriesInput.value, 10);
-		const categoryValue = ui.categorySelect.value; // Get selected category value
-		const descriptionValue = ui.descriptionTextarea.value; // Get description text value
-		// 3.2 construct an object
-		const calorieEntry = {
-			date: dateValue.toISOString(),
-			month: dateValue.getMonth() + 1, // JS months are 0-indexed
-			year: dateValue.getFullYear(),
-			calorie: caloriesValue,
-			category: categoryValue, // Use the value from the category select
-			description: descriptionValue, // Use the value from the description textarea
-		};
-
-		// 3.3 idb.js API func: add Item
-		window.idb
-			.openCaloriesDB('caloriesdb', 1)
-			.then((db) => {
-				return db.addCalories(calorieEntry).then(() => {
-					console.log('Calorie entry added');
-					handleClearFormInputs(); // Clears form inputs after adding an entry
-					// - line 149
-					$('#addRecordModal').modal('hide'); // Using jQuery to hide the modal
-
-					// After adding a new entry, fetch and display all entries
-					getAllReports(db); // Pass the db instance to getAllReports - line 196
-				});
-			})
-			.catch((error) =>
-				console.error('Failed to add calorie entry:', error)
-			);
-	}
-
-	// 3.4 clear form inputs after saving a record
-	function handleClearFormInputs() {
-		ui.dateInput.value = '';
-		ui.caloriesInput.value = '';
-		ui.categorySelect.value = 'BREAKFAST'; // Reset to default
-		ui.descriptionTextarea.value = '';
-	}
-
-	// 4. set up index.html -> getting calories by month and year
-	// 4.1 toggleReportType
+	// change state when entering monthly report
 	function handleToggleReportTypeChange() {
 		ui.dateSelectors.style.display = this.checked ? 'block' : 'none';
-		getReportByMonthAndYear(); // line 205
+		getReportByMonthAndYear();
 	}
-
-
-
-
-	// 4.2 dynamic 10 years dropdown filler
+	// dynamic 10 years dropdown filler
 	function fillYearDropdown() {
 		const currentYear = new Date().getFullYear();
 		for (let year = currentYear; year >= currentYear - 10; year--) {
@@ -174,9 +74,114 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	// 5. Function to render entries to be use in 5.1 and 5.2
+	// API func: Initialize the database
+	function initializeDatabaseAndDisplayReports() {
+		window.idb
+			.openCaloriesDB('caloriesdb', 1)
+			.then(getAllReports)
+			.catch((error) =>
+				console.error('Database initialization failed:', error)
+			);
+	}
+	//---------------------------------------------
+
+	//------------2 input validation---------------
+	function getDateInputValue() {
+		return ui.dateInput.value ? new Date(ui.dateInput.value) : new Date();
+	}
+	// Validation function
+	function validateInputs() {
+		const dateInput = ui.dateInput.value;
+		const caloriesInput = ui.caloriesInput.value;
+		const categorySelect = ui.categorySelect.value;
+		const descriptionTextarea = ui.descriptionTextarea.value;
+
+		// Date validation (simple check if the input is not empty and is a valid date)
+		if (!dateInput || isNaN(new Date(dateInput).getTime())) {
+			alert('Please enter a valid date.');
+			return false;
+		}
+
+		// Calories validation (must be a positive number)
+		if (
+			!caloriesInput ||
+			isNaN(caloriesInput) ||
+			parseInt(caloriesInput, 10) <= 0
+		) {
+			alert('Please enter a valid calorie amount.');
+			return false;
+		}
+
+		// Category validation (should not be empty)
+		if (!categorySelect) {
+			alert('Please select a category.');
+			return false;
+		}
+
+		// Description validation (should not be empty)
+		if (!descriptionTextarea.trim()) {
+			alert('Please enter a description.');
+			return false;
+		}
+
+		return true; // Passes all validations
+	}
+	//---------------------------------------------
+
+	//------------3 add item process---------------
+	// Save button click event = add new Item
+	function handleSaveButtonClick() {
+		if (!validateInputs()) {
+			console.error(
+				'Validation failed. Please correct the input fields.'
+			);
+			return;
+		}
+		const calorieEntry = {
+			date: getDateInputValue(),
+			month: getDateInputValue().getMonth() + 1,
+			year: getDateInputValue().getFullYear(),
+			calorie: parseInt(ui.caloriesInput.value, 10),
+			category: ui.categorySelect.value,
+			description: ui.descriptionTextarea.value.trim(),
+		};
+		addCalorieEntry(calorieEntry);
+	}
+
+	// API func: add new Item
+	function addCalorieEntry(calorieEntry) {
+		window.idb
+			.openCaloriesDB('caloriesdb', 1)
+			.then((db) => {
+				db.addCalories(calorieEntry)
+					.then(() => {
+						console.log('Calorie entry added');
+						handleClearFormInputs();
+						$('#addRecordModal').modal('hide');
+						getAllReports();
+					})
+					.catch((error) => {
+						console.error('Failed to add calorie entry:', error);
+					});
+			})
+			.catch((error) => {
+				console.error('Database operation failed:', error);
+			});
+	}
+
+	// clear form inputs after saving a record
+	function handleClearFormInputs() {
+		ui.dateInput.value = '';
+		ui.caloriesInput.value = '';
+		ui.categorySelect.value = 'BREAKFAST'; // Reset to default
+		ui.descriptionTextarea.value = '';
+	}
+	//---------------------------------------------
+
+	//------------4 print reports---------------
+	// Function to render entries to be use in 4.1 and 4.2
 	function renderEntries(entries) {
-		ui.reportArea.innerHTML = ''; // Clear previous report
+		ui.reportArea.innerHTML = '';
 		if (entries.length > 0) {
 			const list = document.createElement('ul');
 			list.className = 'list-group';
@@ -192,29 +197,27 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	// 5.1 display All calorie items from database
-	function getAllReports(db) {
-		// idb.js API func: add Item
-		db.getReport()
-			.then(renderEntries) //line 178
-			.catch((error) =>
-				console.error('Failed to fetch calorie entries:', error)
-			);
+	// display All calorie items from database
+	function getAllReports() {
+		window.idb
+			.openCaloriesDB('caloriesdb', 1)
+			.then((db) => db.getReport())
+			.then(renderEntries)
+			.catch((error) => console.error('Failed to fetch reports:', error));
 	}
-	// 5.2 display Specific calorie items, based on selections
+	// display Specific calorie items, based on selections
 	function getReportByMonthAndYear() {
-		const month = toggleReportType.checked
+		const month = ui.toggleReportType.checked
 			? parseInt(ui.monthSelector.value, 10)
 			: undefined;
-		const year = toggleReportType.checked
+		const year = ui.toggleReportType.checked
 			? parseInt(ui.yearSelector.value, 10)
 			: undefined;
 
 		window.idb
 			.openCaloriesDB('caloriesdb', 1)
-			.then((db) => db.getReport(month, year)) // idb.js API func: 
-			// get by month and year
-			.then(renderEntries) //line 178
+			.then((db) => db.getReport(month, year))
+			.then(renderEntries)
 			.catch((error) => console.error('Failed to fetch reports:', error));
 	}
 });
