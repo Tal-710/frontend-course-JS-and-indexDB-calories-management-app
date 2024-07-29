@@ -1,18 +1,3 @@
-/*
-    developers:
-        1. developer
-        first name: Amit, 
-        last name": Pompas, 
-        id: 315072397,
-        2. developer
-        first name: Lior, 
-        last name": Bezalel, 
-        id: 207015249,
-        3. developer
-        first name: Tal, 
-        last name": Brachya, 
-        id: 318660859,  
-*/
 //idb.js
 
 // Utility function to format a date object into "dd/mm/yyyy" format.
